@@ -1,4 +1,4 @@
-# Aplicativo PHP com RDS e SNS
+# Aplicação Web PHP com RDS
 
 Aplicativo Web PHP de exemplo para armazenar informações de contato.
 

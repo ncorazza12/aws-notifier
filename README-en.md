@@ -1,4 +1,4 @@
-# PHP app with RDS and SNS
+# PHP app with RDS
 
 Sample PHP WebApp to store contact info.
 
