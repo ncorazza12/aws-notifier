@@ -40,7 +40,7 @@ variable "rds_identifier" {
 
 variable "rds_engine_version" {
   type    = string
-  default = "8.0.35"
+  default = "8.0.42"
 }
 
 variable "rds_sn_group_name" {

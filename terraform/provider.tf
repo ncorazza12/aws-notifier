@@ -1,21 +1,14 @@
 # PROVIDER
 terraform {
 
-  required_version = "~> 1.11.4"
+  required_version = "~> 1.12.2"
 
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.97.0"
+      version = "~> 6.9.0"
     }
   }
-
-  # backend "s3" {
-  #   bucket         = "tf-notifier-state-v3"
-  #   key            = "terraform.tfstate"
-  #   dynamodb_table = "tf-notifier-state-v3"
-  #   region         = "us-east-1"
-  # }
 
 }
 
