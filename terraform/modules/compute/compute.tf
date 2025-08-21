@@ -1,23 +1,28 @@
+# Security Group do VPC Público
 resource "aws_security_group" "vpc_sg_pub" {
   vpc_id = var.vpc_id
+
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = -1
     cidr_blocks = ["0.0.0.0/0"]
   }
+
   ingress {
     from_port   = 0
     to_port     = 0
     protocol    = -1
     cidr_blocks = [var.vpc_cidr]
   }
+
   ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
   ingress {
     from_port   = 80
     to_port     = 80
@@ -26,18 +31,20 @@ resource "aws_security_group" "vpc_sg_pub" {
   }
 }
 
+# User Data Script for EC2
 data "template_file" "user_data" {
   template = file("./modules/compute/scripts/user_data.sh")
   vars = {
-    rds_endpoint   = "${var.rds_endpoint}"
-    rds_dbuser     = "${var.rds_dbuser}"
-    rds_dbpassword = "${var.rds_dbpassword}"
-    rds_dbname     = "${var.rds_dbname}"
+    rds_endpoint   = var.rds_endpoint
+    rds_dbuser     = var.rds_dbuser
+    rds_dbpassword = var.rds_dbpassword
+    rds_dbname     = var.rds_dbname
   }
 }
 
+# Launch Template for EC2 Instances
 resource "aws_launch_template" "ec2_lt" {
-  name                   = var.ec2_lt_name
+  name                   = "${var.ec2_lt_name}-nickolas"
   image_id               = var.ec2_lt_ami
   instance_type          = var.ec2_lt_instance_type
   key_name               = var.ec2_lt_ssh_key_name
@@ -45,18 +52,21 @@ resource "aws_launch_template" "ec2_lt" {
   vpc_security_group_ids = [aws_security_group.vpc_sg_pub.id]
 }
 
+# Load Balancer
 resource "aws_lb" "ec2_lb" {
-  name               = var.ec2_lb_name
+  name               = "${var.ec2_lb_name}-nickolas"
   load_balancer_type = "application"
   subnets            = [var.vpc_sn_pub_az1_id, var.vpc_sn_pub_az2_id]
   security_groups    = [aws_security_group.vpc_sg_pub.id]
 }
 
+# Target Group
 resource "aws_lb_target_group" "ec2_lb_tg" {
-  name     = var.ec2_lb_tg_name
+  name     = "${var.ec2_lb_tg_name}-nickolas"
   protocol = "HTTP"
   port     = 80
   vpc_id   = var.vpc_id
+
   health_check {
     interval            = 5
     healthy_threshold   = 2
@@ -68,6 +78,7 @@ resource "aws_lb_target_group" "ec2_lb_tg" {
   }
 }
 
+# Listener
 resource "aws_lb_listener" "ec2_lb_listener" {
   protocol          = "HTTP"
   port              = 80
@@ -79,13 +90,17 @@ resource "aws_lb_listener" "ec2_lb_listener" {
   }
 }
 
+# Auto Scaling Group
 resource "aws_autoscaling_group" "ec2_asg" {
-  name                = var.ec2_asg_name
+  name                = "${var.ec2_asg_name}-nickolas"
   desired_capacity    = var.ec2_asg_desired_capacity
   min_size            = var.ec2_asg_min_size
   max_size            = var.ec2_asg_max_size
   vpc_zone_identifier = [var.vpc_sn_pub_az1_id, var.vpc_sn_pub_az2_id]
   target_group_arns   = [aws_lb_target_group.ec2_lb_tg.arn]
+
+  wait_for_capacity_timeout = "20m"  # aumenta o timeout para evitar falhas
+
   launch_template {
     id      = aws_launch_template.ec2_lt.id
     version = "$Latest"
