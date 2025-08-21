@@ -93,13 +93,13 @@ resource "aws_lb_listener" "ec2_lb_listener" {
 # Auto Scaling Group
 resource "aws_autoscaling_group" "ec2_asg" {
   name                = "${var.ec2_asg_name}-nickolas"
-  desired_capacity    = var.ec2_asg_desired_capacity
-  min_size            = var.ec2_asg_min_size
-  max_size            = var.ec2_asg_max_size
+  desired_capacity    = 2   # antes vinha de variável (ex: 6) -> reduzido
+  min_size            = 2   # pelo menos 2 instâncias
+  max_size            = 4   # permite escalar até 4
   vpc_zone_identifier = [var.vpc_sn_pub_az1_id, var.vpc_sn_pub_az2_id]
   target_group_arns   = [aws_lb_target_group.ec2_lb_tg.arn]
 
-  wait_for_capacity_timeout = "20m"  # aumenta o timeout para evitar falhas
+  wait_for_capacity_timeout = "20m"  # mantém timeout aumentado
 
   launch_template {
     id      = aws_launch_template.ec2_lt.id
