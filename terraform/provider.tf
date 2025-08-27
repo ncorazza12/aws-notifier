@@ -1,6 +1,4 @@
-# PROVIDER
 terraform {
-
   required_version = "~> 1.12.2"
 
   required_providers {
@@ -10,6 +8,13 @@ terraform {
     }
   }
 
+  backend "s3" {
+    bucket         = "bucket-backend-nickolas-denis"
+    key            = "aws-notifier/terraform.tfstate" # 🔹 separa o state desse projeto
+    region         = "us-east-1"
+    profile        = "iac"
+    # dynamodb_table = "terraform-locks" # opcional, recomendado p/ evitar concorrência
+  }
 }
 
 provider "aws" {
