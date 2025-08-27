@@ -1,5 +1,5 @@
 terraform {
-  required_version = "~> 1.12.2"
+  required_version = ">= 1.11.4"
 
   required_providers {
     aws = {
@@ -8,17 +8,14 @@ terraform {
     }
   }
 
-backend "s3" {
-  bucket  = "bucket-backend-nickolas-denis"
-  key     = "aws-notifier/terraform.tfstate"
-  region  = "us-east-1"
-  profile = "iac"
+  backend "s3" {
+    bucket  = "bucket-backend-nickolas-denis"
+    key     = "aws-notifier/terraform.tfstate"
+    region  = "us-east-1"
+    profile = "iac"  # opcional se usar localmente
+  }
 }
 
-
 provider "aws" {
-  region                   = "us-east-1"
-  shared_config_files      = ["./.aws/config"]
-  shared_credentials_files = ["./.aws/credentials"]
-  profile                  = "iac"
+  region = "us-east-1"
 }
